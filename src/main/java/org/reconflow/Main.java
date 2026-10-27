@@ -18,29 +18,21 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         List<Transaction> paymentTransactions = List.of(
-                new Transaction("TX0012", new BigDecimal("100.00")),
-                new Transaction("TX002", new BigDecimal("100.00")),
-                new Transaction("TX020", new BigDecimal("130.00")),
-                new Transaction("TX0030", new BigDecimal("30.00")),
-                new Transaction("TX0010", new BigDecimal("13.00")),
-                new Transaction("TX0012", new BigDecimal("40.00")),
-                new Transaction("TX0052", new BigDecimal("56.07")),
-                new Transaction("TX0212", new BigDecimal("100.60")),
-                new Transaction("TX0432", new BigDecimal("12.50")),
-                new Transaction("TX5019", new BigDecimal("130.00"))
-                );
+                new Transaction("TX001", new BigDecimal("100.00")),
+                new Transaction("TX002", new BigDecimal("50.00")),
+                new Transaction("TX003", new BigDecimal("75.00")),
+                new Transaction("TX004", new BigDecimal("120.00")),
+                new Transaction("TX005", new BigDecimal("9.99")),
+                new Transaction("TX006", new BigDecimal("200.00"))
+        );
 
         List<Transaction> accountingTransactions = List.of(
-                new Transaction("TX0012", new BigDecimal("100.00")),
-                new Transaction("TX002", new BigDecimal("130.00")),
-                new Transaction("TX020", new BigDecimal("29.00")),
-                new Transaction("TX0030", new BigDecimal("34.50")),
-                new Transaction("TX0010", new BigDecimal("23.00")),
-                new Transaction("TX2042", new BigDecimal("230.00")),
-                new Transaction("TX0052", new BigDecimal("564.07")),
-                new Transaction("TX0212", new BigDecimal("40.60")),
-                new Transaction("TX0432", new BigDecimal("102.50")),
-                new Transaction("TX5019", new BigDecimal("130.00"))
+                new Transaction("TX001", new BigDecimal("100.00")),
+                new Transaction("TX002", new BigDecimal("55.00")),
+                new Transaction("TX004", new BigDecimal("120.00")),
+                new Transaction("TX005", new BigDecimal("10.00")),
+                new Transaction("TX007", new BigDecimal("30.00")),
+                new Transaction("TX008", new BigDecimal("80.00"))
         );
 
         ReconciliationService service = new ReconciliationService();
