@@ -4,7 +4,13 @@ import org.reconflow.inputHelpers.InputHelpers;
 import org.reconflow.model.Transaction;
 import org.reconflow.service.ReconciliationService;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -17,23 +23,9 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
-        List<Transaction> paymentTransactions = List.of(
-                new Transaction("TX001", new BigDecimal("100.00")),
-                new Transaction("TX002", new BigDecimal("50.00")),
-                new Transaction("TX003", new BigDecimal("75.00")),
-                new Transaction("TX004", new BigDecimal("120.00")),
-                new Transaction("TX005", new BigDecimal("9.99")),
-                new Transaction("TX006", new BigDecimal("200.00"))
-        );
+        List<Transaction> paymentTransactions = loadData("data/payments.csv");
 
-        List<Transaction> accountingTransactions = List.of(
-                new Transaction("TX001", new BigDecimal("100.00")),
-                new Transaction("TX002", new BigDecimal("55.00")),
-                new Transaction("TX004", new BigDecimal("120.00")),
-                new Transaction("TX005", new BigDecimal("10.00")),
-                new Transaction("TX007", new BigDecimal("30.00")),
-                new Transaction("TX008", new BigDecimal("80.00"))
-        );
+        List<Transaction> accountingTransactions = loadData("data/accounting.csv");
 
         ReconciliationService service = new ReconciliationService();
         service.runReconciliation(paymentTransactions, accountingTransactions);
@@ -50,5 +42,27 @@ public class Main {
                 runAction(scanner, choice, service);
             }
         }
+        scanner.close();
+    }
+
+    public static List<Transaction> loadData(String path) {
+        List<Transaction> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(path))) {
+            String line;
+            br.readLine();
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+
+                String transactionId = values[0];
+                BigDecimal amount = new BigDecimal(values[1]);
+
+                Transaction transaction = new Transaction(transactionId, amount);
+                records.add(transaction);
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading ");
+            return records;
+        }
+        return records;
     }
 }
