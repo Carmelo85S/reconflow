@@ -5,14 +5,13 @@ import org.reconflow.model.Transaction;
 
 import java.util.List;
 
+import static org.reconflow.UI.Layout.headerTable;
+
 public class ReconciliationService {
 
     public void runReconciliation(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
 
-        System.out.println(" ---------------------------------------------------------------------------");
-        System.out.printf("| %-13s | %-13s | %-13s | %-18s |%n",
-                "Transaction id", "Payment amount", "Accounting amount", "Status");
-        System.out.println(" ---------------------------------------------------------------------------");
+        headerTable();
 
         for (Transaction payment : paymentTransactions) {
             boolean found = false;
@@ -27,7 +26,7 @@ public class ReconciliationService {
                         status = ReconciliationStatus.AMOUNT_MISMATCH;
                     }
                     System.out.printf(
-                            "| %-14s | %-14s | %-17s | %-18s | %n",
+                            "| %-14s | %-14s | %-17s | %-25s | %n",
                             payment.getTransactionId(),
                             payment.getAmount(),
                             accounting.getAmount(),
@@ -39,7 +38,7 @@ public class ReconciliationService {
             }
             if (!found) {
                 System.out.printf(
-                        "| %-14s | %-14s | %-17s | %-18s | %n",
+                        "| %-14s | %-14s | %-17s | %-25s | %n",
                         payment.getTransactionId(),
                         payment.getAmount(),
                         " - ",
@@ -47,7 +46,68 @@ public class ReconciliationService {
                 );
             }
         }
-        System.out.println(" ---------------------------------------------------------------------------");
+        System.out.println(" ---------------------------------------------------------------------------------");
 
     }
+
+    public void viewDiscrepancies(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+        headerTable();
+
+        for (Transaction p : paymentTransactions) {
+            boolean found = false;
+
+            for (Transaction a : accountingTransactions) {
+                if (p.getTransactionId().equals(a.getTransactionId())) {
+                    found = true;
+
+                    if (p.getAmount().compareTo(a.getAmount()) !=0) {
+                        System.out.printf(
+                                "| %-14s | %-14s | %-17s | %-25s | %n",
+                                p.getTransactionId(),
+                                p.getAmount(),
+                                a.getAmount(),
+                                ReconciliationStatus.AMOUNT_MISMATCH.getLabel()
+                        );
+                    }
+
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.printf(
+                        "| %-14s | %-14s | %-17s | %-25s | %n",
+                        p.getTransactionId(),
+                        p.getAmount(),
+                        "-",
+                        ReconciliationStatus.MISSING_IN_ACCOUNTING.getLabel()
+                );
+            }
+        }
+        for (Transaction a : accountingTransactions) {
+            boolean found = false;
+
+            for (Transaction pa : paymentTransactions) {
+                if (a.getTransactionId().equals(pa.getTransactionId())) {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found) {
+                System.out.printf(
+                        "| %-14s | %-14s | %-17s | %-25s | %n",
+                        a.getTransactionId(),
+                        "-",
+                        a.getAmount(),
+                        ReconciliationStatus.MISSING_IN_PAYMENT_SYSTEM.getLabel()
+                );
+            }
+        }
+
+        System.out.println(" ---------------------------------------------------------------------------------");
+
+    }
+
+    public void viewTransacitions(List<Transaction> paymentTransactions, List<Transaction> accountingTransaction){}
 }

@@ -14,6 +14,8 @@ public class Menu{
                 case 1 -> service.runReconciliation(paymentTransactions, accountingTransactions);
                 case 2 -> System.out.println("View transactions");
                 case 3 -> System.out.println("View statistics");
+                case 4 -> service.viewDiscrepancies(paymentTransactions, accountingTransactions);
+                case 5 -> System.out.println("Export report");
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid input");
             }

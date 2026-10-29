@@ -7,14 +7,13 @@ import org.reconflow.service.ReconciliationService;
 import java.util.List;
 import java.util.Scanner;
 
-import static org.reconflow.UI.Layout.printHeader;
-import static org.reconflow.UI.Layout.showMenu;
+import static org.reconflow.UI.Layout.*;
 import static org.reconflow.repository.HandleData.loadData;
 import static org.reconflow.service.Menu.runAction;
 
 public class Main {
     public static void main(String[] args) {
-
+        printWelcomeMessage();
         Scanner scanner = new Scanner(System.in);
 
         List<Transaction> paymentTransactions = loadData("data/payments.csv");
@@ -27,7 +26,7 @@ public class Main {
         int choice;
         while (running) {
             showMenu();
-            choice = InputHelpers.readMenuChoice(scanner, 0, 3, "Choose your option: > ");
+            choice = InputHelpers.readMenuChoice(scanner, 0, 5, "Choose your option: > ");
             if (choice == 0) {
                 running = false;
             } else {
