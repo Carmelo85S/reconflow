@@ -7,12 +7,12 @@ import java.util.List;
 
 public class ReconciliationService {
 
-    public void reconcile(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+    public void runReconciliation(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
 
-        System.out.println(" ------------------------------------------------------------------------");
-        System.out.printf("| %-13s | %-13s | %-13s | %-15s |%n",
+        System.out.println(" ---------------------------------------------------------------------------");
+        System.out.printf("| %-13s | %-13s | %-13s | %-18s |%n",
                 "Transaction id", "Payment amount", "Accounting amount", "Status");
-        System.out.println(" ------------------------------------------------------------------------");
+        System.out.println(" ---------------------------------------------------------------------------");
 
         for (Transaction payment : paymentTransactions) {
             boolean found = false;
@@ -27,11 +27,11 @@ public class ReconciliationService {
                         status = ReconciliationStatus.AMOUNT_MISMATCH;
                     }
                     System.out.printf(
-                            "| %-14s | %-14s | %-17s | %-14s | %n",
+                            "| %-14s | %-14s | %-17s | %-18s | %n",
                             payment.getTransactionId(),
                             payment.getAmount(),
                             accounting.getAmount(),
-                            status
+                            status.getLabel()
                     );
                     found = true;
                     break;
@@ -39,15 +39,15 @@ public class ReconciliationService {
             }
             if (!found) {
                 System.out.printf(
-                        "| %-14s | %-14s | %-17s | %-14s | %n",
+                        "| %-14s | %-14s | %-17s | %-18s | %n",
                         payment.getTransactionId(),
                         payment.getAmount(),
                         " - ",
-                        ReconciliationStatus.MISSING_IN_ACCOUNTING
+                        ReconciliationStatus.MISSING_IN_ACCOUNTING.getLabel()
                 );
             }
         }
-        System.out.println(" ------------------------------------------------------------------------");
+        System.out.println(" ---------------------------------------------------------------------------");
 
     }
 }

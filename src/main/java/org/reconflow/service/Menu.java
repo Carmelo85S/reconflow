@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class Menu{
 
-    public static void runAction(Scanner scanner, int choice) {
+    public static void runAction(Scanner scanner, int choice, ReconciliationService service) {
         try {
             switch (choice) {
                 case 1 -> System.out.println("Run reconciliation");

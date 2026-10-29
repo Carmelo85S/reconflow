@@ -36,7 +36,7 @@ public class Main {
         );
 
         ReconciliationService service = new ReconciliationService();
-        service.reconcile(paymentTransactions, accountingTransactions);
+        service.runReconciliation(paymentTransactions, accountingTransactions);
 
         printHeader("Recon Flow", "Transaction Reconciliation");
         boolean running = true;
@@ -47,7 +47,7 @@ public class Main {
             if (choice == 0) {
                 running = false;
             } else {
-                runAction(scanner, choice);
+                runAction(scanner, choice, service);
             }
         }
     }
