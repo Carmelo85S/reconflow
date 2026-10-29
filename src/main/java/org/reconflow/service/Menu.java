@@ -12,7 +12,7 @@ public class Menu{
         try {
             switch (choice) {
                 case 1 -> service.runReconciliation(paymentTransactions, accountingTransactions);
-                case 2 -> System.out.println("View transactions");
+                case 2 -> service.viewTransacitions(paymentTransactions, accountingTransactions);
                 case 3 -> System.out.println("View statistics");
                 case 4 -> service.viewDiscrepancies(paymentTransactions, accountingTransactions);
                 case 5 -> System.out.println("Export report");

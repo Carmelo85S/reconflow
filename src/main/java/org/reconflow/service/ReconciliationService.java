@@ -60,7 +60,7 @@ public class ReconciliationService {
                 if (p.getTransactionId().equals(a.getTransactionId())) {
                     found = true;
 
-                    if (p.getAmount().compareTo(a.getAmount()) !=0) {
+                    if (p.getAmount().compareTo(a.getAmount()) != 0) {
                         System.out.printf(
                                 "| %-14s | %-14s | %-17s | %-25s | %n",
                                 p.getTransactionId(),
@@ -109,5 +109,29 @@ public class ReconciliationService {
 
     }
 
-    public void viewTransacitions(List<Transaction> paymentTransactions, List<Transaction> accountingTransaction){}
+    public void viewTransacitions(List<Transaction> paymentTransactions, List<Transaction> accountingTransaction) {
+        System.out.println("\n=== PAYMENT TRANSACTIONS ===");
+        System.out.println(" ---------------------------------");
+        System.out.printf("| %-13s | %-13s |%n",
+                "Transaction id", "Amount");
+        System.out.println(" --------------------------------");
+        for (Transaction p : paymentTransactions) {
+            System.out.printf("| %-14s | %-13s |%n",
+                    p.getTransactionId(),
+                    p.getAmount()
+            );
+        }
+        System.out.println("\n=== ACCOUNTING TRANSACTIONS ===");
+        System.out.println(" --------------------------------");
+        System.out.printf("| %-13s | %-13s |%n",
+                "Transaction id", "Amount");
+        System.out.println(" --------------------------------");
+        for (Transaction p : paymentTransactions) {
+            System.out.printf("| %-14s | %-13s |%n",
+                    p.getTransactionId(),
+                    p.getAmount()
+            );
+        }
+        System.out.println(" --------------------------------");
+    }
 }
