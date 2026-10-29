@@ -8,32 +8,46 @@ import java.util.List;
 public class ReconciliationService {
 
     public void reconcile(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+
+        System.out.println(" ------------------------------------------------------------------------");
+        System.out.printf("| %-13s | %-13s | %-13s | %-15s |%n",
+                "Transaction id", "Payment amount", "Accounting amount", "Status");
+        System.out.println(" ------------------------------------------------------------------------");
+
         for (Transaction payment : paymentTransactions) {
             boolean found = false;
 
             for (Transaction accounting : accountingTransactions) {
                 if (payment.getTransactionId().equals(accounting.getTransactionId())) {
-                    System.out.println("-------------------------------");
-                    System.out.println("Transaction Id: " + payment.getTransactionId());
-                    System.out.println("Payment amount: " + payment.getAmount());
-                    System.out.println("Accounting Amount: " + accounting.getAmount());
-                    found = true;
                     ReconciliationStatus status;
-                    if(payment.getAmount().compareTo(accounting.getAmount()) == 0){
+
+                    if (payment.getAmount().compareTo(accounting.getAmount()) == 0) {
                         status = ReconciliationStatus.MATCH;
-                    }else {
+                    } else {
                         status = ReconciliationStatus.AMOUNT_MISMATCH;
                     }
-                    System.out.println("Status: " + status);
-
+                    System.out.printf(
+                            "| %-14s | %-14s | %-17s | %-14s | %n",
+                            payment.getTransactionId(),
+                            payment.getAmount(),
+                            accounting.getAmount(),
+                            status
+                    );
+                    found = true;
+                    break;
                 }
             }
             if (!found) {
-                System.out.println("-------------------------------");
-                System.out.println("Transaction Id: " + payment.getTransactionId());
-                System.out.println("Status: " + ReconciliationStatus.MISSING_IN_ACCOUNTING);
-                System.out.println();
+                System.out.printf(
+                        "| %-14s | %-14s | %-17s | %-14s | %n",
+                        payment.getTransactionId(),
+                        payment.getAmount(),
+                        " - ",
+                        ReconciliationStatus.MISSING_IN_ACCOUNTING
+                );
             }
         }
+        System.out.println(" ------------------------------------------------------------------------");
+
     }
 }
