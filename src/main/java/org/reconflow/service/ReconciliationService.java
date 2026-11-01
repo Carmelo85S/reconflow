@@ -18,52 +18,18 @@ public class ReconciliationService {
 
         for (Transaction payment : paymentTransactions) {
 
-            Transaction accounting= findAccountingTransaction(payment, accountingTransactions);
-            boolean found = accounting != null;
+            Transaction accounting = findAccountingTransaction(payment, accountingTransactions);
 
-                if (found){
-
-                    boolean isDuplicated = isDuplicated(payment.getTransactionId(), duplicated);
-
-                    ReconciliationStatus status;
-                    if (isDuplicated) {
-                        status = ReconciliationStatus.POTENTIAL_DUPLICATE;
-                    } else if (isMatch(payment, accounting)) {
-                        status = ReconciliationStatus.MATCH;
-                    } else {
-                        status = ReconciliationStatus.AMOUNT_MISMATCH;
-                    }
-
-                    System.out.printf(
-                            "| %-14s | %-14s | %-17s | %-25s | %n",
-                            payment.getTransactionId(),
-                            payment.getAmount(),
-                            accounting.getAmount(),
-                            status.getLabel()
-                    );
-                }
-
-            if (!found) {
-                boolean isDuplicated = isDuplicated(payment.getTransactionId(), duplicated);
-
-                ReconciliationStatus status;
-
-                if (isDuplicated) {
-                    status = ReconciliationStatus.POTENTIAL_DUPLICATE;
-                } else {
-                    status = ReconciliationStatus.MISSING_IN_ACCOUNTING;
-                }
+                ReconciliationStatus status = determineStatus(payment, accounting, duplicated);
 
                 System.out.printf(
                         "| %-14s | %-14s | %-17s | %-25s | %n",
                         payment.getTransactionId(),
                         payment.getAmount(),
-                        " - ",
+                        accounting != null ? accounting.getAmount() : "-",
                         status.getLabel()
                 );
-            }
         }
-
         System.out.println(" ---------------------------------------------------------------------------------");
 
     }
@@ -127,7 +93,7 @@ public class ReconciliationService {
 
     }
 
-    public void viewTransacitions(List<Transaction> paymentTransactions, List<Transaction> accountingTransaction) {
+    public void viewTransactions(List<Transaction> paymentTransactions, List<Transaction> accountingTransaction) {
         System.out.println("\n=== TRANSACTIONS REPORT ===");
         System.out.println(" ------------------------------------------------------------------------------");
         System.out.printf("| %-15s | %-13s |         | %-15s | %-13s |%n",
@@ -171,22 +137,22 @@ public class ReconciliationService {
         }
     }
 
-    public static boolean isMatch(Transaction paymentTransactions, Transaction accountingTransaction){
+    public static boolean isMatch(Transaction paymentTransactions, Transaction accountingTransaction) {
 
         return paymentTransactions.getTransactionId().equals(accountingTransaction.getTransactionId())
                 && paymentTransactions.getAmount().compareTo(accountingTransaction.getAmount()) == 0;
     }
 
-    private Transaction findAccountingTransaction(Transaction payment, List<Transaction> accountingTransaction){
-        for(Transaction accounting : accountingTransaction){
-            if(payment.getTransactionId().equals(accounting.getTransactionId())){
+    private Transaction findAccountingTransaction(Transaction payment, List<Transaction> accountingTransaction) {
+        for (Transaction accounting : accountingTransaction) {
+            if (payment.getTransactionId().equals(accounting.getTransactionId())) {
                 return accounting;
             }
         }
         return null;
     }
 
-    private List<Transaction> findDuplicates(List<Transaction> paymentTransactions){
+    private List<Transaction> findDuplicates(List<Transaction> paymentTransactions) {
         List<Transaction> duplicated = new ArrayList<>();
         List<String> seenId = new ArrayList<>();
         for (Transaction dup : paymentTransactions) {
@@ -200,12 +166,30 @@ public class ReconciliationService {
         return duplicated;
     }
 
-    private boolean isDuplicated(String transactionId, List<Transaction> duplicated){
-        for(Transaction duplicate : duplicated){
-            if(duplicate.getTransactionId().equals(transactionId)){
+    private static boolean isDuplicated(String transactionId, List<Transaction> duplicated) {
+        for (Transaction duplicate : duplicated) {
+            if (duplicate.getTransactionId().equals(transactionId)) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static ReconciliationStatus determineStatus(Transaction payment, Transaction accounting, List<Transaction> duplicated) {
+        boolean isDuplicated = isDuplicated(payment.getTransactionId(), duplicated);
+
+        if (isDuplicated) {
+            return ReconciliationStatus.POTENTIAL_DUPLICATE;
+        }
+        if (accounting == null) {
+            return ReconciliationStatus.MISSING_IN_ACCOUNTING;
+
+        }
+        if (isMatch(payment, accounting)) {
+            return ReconciliationStatus.MATCH;
+        }
+
+        return ReconciliationStatus.AMOUNT_MISMATCH;
+
     }
 }
