@@ -121,17 +121,7 @@ public class ReconciliationService {
     }
 
     public void viewDuplicated(List<Transaction> paymentTransactions) {
-        List<Transaction> duplicated = new ArrayList<>();
-        List<String> seenId = new ArrayList<>();
-
-        for (Transaction d : paymentTransactions) {
-            String id = d.getTransactionId();
-            if (seenId.contains(id)) {
-                duplicated.add(d);
-            } else {
-                seenId.add(id);
-            }
-        }
+        List<Transaction> duplicated = findDuplicates(paymentTransactions);
         for (Transaction d : duplicated) {
             System.out.println(d.getTransactionId() + " - " + d.getAmount());
         }
