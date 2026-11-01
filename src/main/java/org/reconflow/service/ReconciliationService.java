@@ -13,38 +13,22 @@ public class ReconciliationService {
     public void runReconciliation(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
 
         headerTable();
-        List<Transaction> duplicated = new ArrayList<>();
-        List<String> seenId = new ArrayList<>();
 
-        for (Transaction d : paymentTransactions) {
-            String id = d.getTransactionId();
-            if (seenId.contains(id)) {
-                duplicated.add(d);
-            } else {
-                seenId.add(id);
-            }
-        }
+        List<Transaction> duplicated = findDuplicates(paymentTransactions);
 
         for (Transaction payment : paymentTransactions) {
-            boolean found = false;
 
-            for (Transaction accounting : accountingTransactions) {
+            Transaction accounting= findAccountingTransaction(payment, accountingTransactions);
+            boolean found = accounting != null;
 
-                if (payment.getTransactionId().equals(accounting.getTransactionId())) {
+                if (found){
+
+                    boolean isDuplicated = isDuplicated(payment.getTransactionId(), duplicated);
+
                     ReconciliationStatus status;
-
-                    boolean isDuplicated = false;
-
-                    for(Transaction dup : duplicated) {
-                        if (dup.getTransactionId().equals(payment.getTransactionId())){
-                            isDuplicated = true;
-                            break;
-                        }
-                    }
-
                     if (isDuplicated) {
                         status = ReconciliationStatus.POTENTIAL_DUPLICATE;
-                    } else if (payment.getAmount().compareTo(accounting.getAmount()) == 0) {
+                    } else if (isMatch(payment, accounting)) {
                         status = ReconciliationStatus.MATCH;
                     } else {
                         status = ReconciliationStatus.AMOUNT_MISMATCH;
@@ -57,19 +41,10 @@ public class ReconciliationService {
                             accounting.getAmount(),
                             status.getLabel()
                     );
-                    found = true;
-                    break;
                 }
-            }
-            if (!found) {
-                boolean isDuplicated = false;
 
-                for (Transaction dup : duplicated) {
-                    if (dup.getTransactionId().equals(payment.getTransactionId())) {
-                        isDuplicated = true;
-                        break;
-                    }
-                }
+            if (!found) {
+                boolean isDuplicated = isDuplicated(payment.getTransactionId(), duplicated);
 
                 ReconciliationStatus status;
 
@@ -194,5 +169,43 @@ public class ReconciliationService {
         for (Transaction d : duplicated) {
             System.out.println(d.getTransactionId() + " - " + d.getAmount());
         }
+    }
+
+    public static boolean isMatch(Transaction paymentTransactions, Transaction accountingTransaction){
+
+        return paymentTransactions.getTransactionId().equals(accountingTransaction.getTransactionId())
+                && paymentTransactions.getAmount().compareTo(accountingTransaction.getAmount()) == 0;
+    }
+
+    private Transaction findAccountingTransaction(Transaction payment, List<Transaction> accountingTransaction){
+        for(Transaction accounting : accountingTransaction){
+            if(payment.getTransactionId().equals(accounting.getTransactionId())){
+                return accounting;
+            }
+        }
+        return null;
+    }
+
+    private List<Transaction> findDuplicates(List<Transaction> paymentTransactions){
+        List<Transaction> duplicated = new ArrayList<>();
+        List<String> seenId = new ArrayList<>();
+        for (Transaction dup : paymentTransactions) {
+            String id = dup.getTransactionId();
+            if (seenId.contains(id)) {
+                duplicated.add(dup);
+            } else {
+                seenId.add(id);
+            }
+        }
+        return duplicated;
+    }
+
+    private boolean isDuplicated(String transactionId, List<Transaction> duplicated){
+        for(Transaction duplicate : duplicated){
+            if(duplicate.getTransactionId().equals(transactionId)){
+                return true;
+            }
+        }
+        return false;
     }
 }
