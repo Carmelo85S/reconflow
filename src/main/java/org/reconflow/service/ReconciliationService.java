@@ -4,6 +4,7 @@ import org.reconflow.model.ReconciliationStatus;
 import org.reconflow.model.Transaction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -115,12 +116,14 @@ public class ReconciliationService {
     }
 
     private Transaction findAccountingTransaction(Transaction payment, List<Transaction> accountingTransaction) {
+
+        HashMap<String, Transaction> findAccTrx = new HashMap<>();
+
+
         for (Transaction accounting : accountingTransaction) {
-            if (payment.getTransactionId().equals(accounting.getTransactionId())) {
-                return accounting;
-            }
+            findAccTrx.put(accounting.getTransactionId(), accounting);
         }
-        return null;
+        return findAccTrx.get(payment.getTransactionId());
     }
 
     private Transaction findPaymentTransaction(Transaction accounting, List<Transaction> paymentTransaction) {
