@@ -4,6 +4,7 @@ import org.reconflow.model.ReconciliationStatus;
 import org.reconflow.model.Transaction;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import static org.reconflow.UI.Layout.headerTable;
@@ -133,13 +134,19 @@ public class ReconciliationService {
 
     private List<Transaction> findDuplicates(List<Transaction> paymentTransactions) {
         List<Transaction> duplicated = new ArrayList<>();
-        List<String> seenId = new ArrayList<>();
+        HashSet<String> seenId = new HashSet<>();
+        HashSet<String> duplicateIds = new HashSet<>();
         for (Transaction dup : paymentTransactions) {
             String id = dup.getTransactionId();
             if (seenId.contains(id)) {
-                duplicated.add(dup);
+                duplicateIds.add(id);
             } else {
                 seenId.add(id);
+            }
+        }
+        for (Transaction d : paymentTransactions) {
+            if (duplicateIds.contains(d.getTransactionId())) {
+                duplicated.add(d);
             }
         }
         return duplicated;

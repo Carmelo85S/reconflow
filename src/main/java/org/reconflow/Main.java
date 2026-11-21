@@ -30,7 +30,7 @@ public class Main {
             if (choice == 0) {
                 running = false;
             } else {
-                runAction(scanner, choice, service, paymentTransactions, accountingTransactions);
+                runAction(scanner, choice, service, 3paymentTransactions, accountingTransactions);
             }
         }
         scanner.close();
