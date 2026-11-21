@@ -115,25 +115,15 @@ public class ReconciliationService {
                 && paymentTransactions.getAmount().compareTo(accountingTransaction.getAmount()) == 0;
     }
 
-    private Transaction findAccountingTransaction(Transaction payment, List<Transaction> accountingTransaction) {
+    private Transaction findAccountingTransaction(Transaction payment, HashMap<String, Transaction> accountingTransaction) {
 
-        HashMap<String, Transaction> findAccTrx = new HashMap<>();
+        return accountingTransaction.get(payment.getTransactionId());
 
-
-        for (Transaction accounting : accountingTransaction) {
-            findAccTrx.put(accounting.getTransactionId(), accounting);
-        }
-        return findAccTrx.get(payment.getTransactionId());
     }
 
-    private Transaction findPaymentTransaction(Transaction accounting, List<Transaction> paymentTransaction) {
+    private Transaction findPaymentTransaction(Transaction accounting, HashMap<String, Transaction> paymentTransaction) {
 
-        HashMap<String, Transaction> findPmtTrx = new HashMap<>();
-
-        for (Transaction payment : paymentTransaction) {
-           findPmtTrx.put(payment.getTransactionId(), payment);
-        }
-        return findPmtTrx.get(accounting.getTransactionId());
+        return paymentTransaction.get(accounting.getTransactionId());
     }
 
     private List<Transaction> findDuplicates(List<Transaction> paymentTransactions) {
