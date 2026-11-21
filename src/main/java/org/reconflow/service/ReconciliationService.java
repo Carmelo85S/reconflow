@@ -12,7 +12,8 @@ import static org.reconflow.UI.Layout.headerTable;
 
 public class ReconciliationService {
 
-    public void runReconciliation(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+    public void runReconciliation(  List<Transaction> paymentTransactions,
+                                    HashMap<String, Transaction> accountingById) {
 
         headerTable();
 
@@ -20,7 +21,7 @@ public class ReconciliationService {
 
         for (Transaction payment : paymentTransactions) {
 
-            Transaction accounting = findAccountingTransaction(payment, accountingTransactions);
+            Transaction accounting = findAccountingTransaction(payment, accountingById);
 
             ReconciliationStatus status = determineStatus(payment, accounting, duplicated);
 
@@ -36,13 +37,18 @@ public class ReconciliationService {
 
     }
 
-    public void viewDiscrepancies(List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+    public void viewDiscrepancies(
+            List<Transaction> paymentTransactions,
+            List<Transaction> accountingTransactions,
+            HashMap<String, Transaction> paymentById,
+            HashMap<String, Transaction> accountingById) {
         headerTable();
         List<Transaction> duplicated = findDuplicates(paymentTransactions);
 
         for (Transaction p : paymentTransactions) {
 
-            Transaction accounting = findAccountingTransaction(p, accountingTransactions);
+            Transaction accounting =
+                    findAccountingTransaction(p, accountingById);
 
             ReconciliationStatus status = determineStatus(p, accounting, duplicated);
 
@@ -58,7 +64,7 @@ public class ReconciliationService {
         }
         for (Transaction accounting : accountingTransactions) {
 
-            Transaction payment = findPaymentTransaction(accounting, paymentTransactions);
+            Transaction payment = findPaymentTransaction(accounting, paymentById);
 
             if (payment == null) {
                 System.out.printf(

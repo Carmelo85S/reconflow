@@ -3,18 +3,25 @@ package org.reconflow.service;
 import org.reconflow.exceptions.QuitReconflowOperationException;
 import org.reconflow.model.Transaction;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-public class Menu{
+public class Menu {
 
-    public static void runAction(Scanner scanner, int choice, ReconciliationService service, List<Transaction> paymentTransactions, List<Transaction> accountingTransactions) {
+    public static void runAction(Scanner scanner, int choice, ReconciliationService service, List<Transaction> paymentTransactions, List<Transaction> accountingTransactions, HashMap<String, Transaction> paymentById,
+                                 HashMap<String, Transaction> accountingById) {
         try {
             switch (choice) {
-                case 1 -> service.runReconciliation(paymentTransactions, accountingTransactions);
+                case 1 -> service.runReconciliation(paymentTransactions, accountingById);
                 case 2 -> service.viewTransactions(paymentTransactions, accountingTransactions);
                 case 3 -> service.viewDuplicated(paymentTransactions);
-                case 4 -> service.viewDiscrepancies(paymentTransactions, accountingTransactions);
+                case 4 -> service.viewDiscrepancies(
+                        paymentTransactions,
+                        accountingTransactions,
+                        paymentById,
+                        accountingById
+                );
                 case 5 -> System.out.println("Export report");
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid input");
