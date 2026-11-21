@@ -127,12 +127,13 @@ public class ReconciliationService {
     }
 
     private Transaction findPaymentTransaction(Transaction accounting, List<Transaction> paymentTransaction) {
+
+        HashMap<String, Transaction> findPmtTrx = new HashMap<>();
+
         for (Transaction payment : paymentTransaction) {
-            if (accounting.getTransactionId().equals(payment.getTransactionId())) {
-                return payment;
-            }
+           findPmtTrx.put(payment.getTransactionId(), payment);
         }
-        return null;
+        return findPmtTrx.get(accounting.getTransactionId());
     }
 
     private List<Transaction> findDuplicates(List<Transaction> paymentTransactions) {
