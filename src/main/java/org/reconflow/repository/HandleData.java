@@ -1,6 +1,6 @@
 package org.reconflow.repository;
 
-import org.reconflow.model.Transaction;
+import org.reconflow.models.Transaction;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

@@ -1,10 +1,13 @@
-package org.reconflow.model;
+package org.reconflow.models;
+
+import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 
 public class Transaction {
     private String transactionId;
     private BigDecimal amount;
+
 
     public Transaction(String transactionId, BigDecimal amount){
         this.transactionId = transactionId;

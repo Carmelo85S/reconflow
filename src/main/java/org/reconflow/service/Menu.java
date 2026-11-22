@@ -1,7 +1,7 @@
 package org.reconflow.service;
 
 import org.reconflow.exceptions.QuitReconflowOperationException;
-import org.reconflow.model.Transaction;
+import org.reconflow.models.Transaction;
 
 import java.util.HashMap;
 import java.util.List;

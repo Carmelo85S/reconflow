@@ -1,4 +1,4 @@
-package org.reconflow.model;
+package org.reconflow.models;
 
 public enum ReconciliationStatus {
     MATCH ("Match"),

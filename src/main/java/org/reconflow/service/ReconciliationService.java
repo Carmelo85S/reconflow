@@ -1,7 +1,7 @@
 package org.reconflow.service;
 
-import org.reconflow.model.ReconciliationStatus;
-import org.reconflow.model.Transaction;
+import org.reconflow.models.ReconciliationStatus;
+import org.reconflow.models.Transaction;
 
 import java.util.ArrayList;
 import java.util.HashMap;
