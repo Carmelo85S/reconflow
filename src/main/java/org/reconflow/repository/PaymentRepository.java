@@ -1,5 +1,6 @@
 package org.reconflow.repository;
 
+import org.reconflow.models.Accounting;
 import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
 
@@ -8,7 +9,7 @@ import java.util.Optional;
 
 public interface PaymentRepository {
 
-    void save(List<Payments> payment);
+    void save(List<Payments> payment, List<Accounting> accounting);
 
     List<Payments> findAll();
 

@@ -2,6 +2,7 @@ package org.reconflow;
 
 import org.reconflow.config.EntityManagerUtil;
 import org.reconflow.inputHelpers.InputHelpers;
+import org.reconflow.models.Accounting;
 import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
 import org.reconflow.repository.PaymentRepository;
@@ -46,6 +47,13 @@ public class Main {
                 ))
                 .toList();
 
+        List<Accounting> accounting = accountingTransactions.stream()
+                .map(transaction -> new Accounting(
+                        transaction.getTransactionId(),
+                        transaction.getAmount()
+                ))
+                .toList();
+
 
         ReconciliationService service = new ReconciliationService();
 
@@ -67,6 +75,7 @@ public class Main {
                         paymentById,
                         accountingById,
                         payments,
+                        accounting,
                         pri
                 );
             }
