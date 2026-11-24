@@ -4,22 +4,24 @@
 
 ReconFlow is a learning project designed to explore how financial systems compare transaction records from different sources, identify discrepancies, and highlight transactions that require further investigation.
 
+The project currently uses Java, Hibernate and PostgreSQL to manage and persist transaction data.
+
 ## Example Output
 
 The following example shows how ReconFlow identifies differences between payment and accounting records, including potential duplicate transactions.
 
-| **Transaction ID** | **Payment Amount** | **Accounting Amount** | **Status** |
-|---|---:|---:|---|
-| TX001 | 100.00 | 100.00 | Match |
-| TX002 | 50.00 | 55.00 | Amount mismatch |
-| TX003 | 75.00 | — | Missing in accounting |
-| TX004 | 120.00 | 120.00 | Match |
-| TX005 | 9.99 | 10.00 | Amount mismatch |
-| TX006 | 200.00 | — | Potential duplicate |
-| TX006 | 200.00 | — | Potential duplicate |
-| TX009 | 45.50 | 45.50 | Match |
-| TX010 | 300.00 | 300.00 | Match |
-| TX012 | 640.00 | 635.00 | Amount mismatch |
+| **Transaction ID** | **Payment Amount** | **Accounting Amount** | **Status**            |
+| ------------------ | -----------------: | --------------------: | --------------------- |
+| TX001              |             100.00 |                100.00 | Match                 |
+| TX002              |              50.00 |                 55.00 | Amount mismatch       |
+| TX003              |              75.00 |                     — | Missing in accounting |
+| TX004              |             120.00 |                120.00 | Match                 |
+| TX005              |               9.99 |                 10.00 | Amount mismatch       |
+| TX006              |             200.00 |                     — | Potential duplicate   |
+| TX006              |             200.00 |                     — | Potential duplicate   |
+| TX009              |              45.50 |                 45.50 | Match                 |
+| TX010              |             300.00 |                300.00 | Match                 |
+| TX012              |             640.00 |                635.00 | Amount mismatch       |
 
 ## Project Goal
 
@@ -37,14 +39,19 @@ ReconFlow aims to identify these differences through a reconciliation process, h
 - Detect potential duplicate transaction IDs.
 - Display payment and accounting transactions side by side.
 - Generate reconciliation and discrepancy reports through a command-line interface.
+- Persist payment and accounting transactions in PostgreSQL.
+- Use Hibernate/JPA for database operations.
+- Prevent repeated imports of identical transactions using transaction ID and amount.
 
 ## Technologies
 
 - **Java 21**
 - **Maven**
-- **CSV file handling**
+- **PostgreSQL**
+- **Hibernate ORM / Jakarta Persistence (JPA)**
 - **BigDecimal** for monetary values
 - **Java Collections:** List, HashMap and HashSet
+- **CSV file handling**
 - **Git and GitHub**
 
 ## Technical Implementation
@@ -57,7 +64,7 @@ ReconFlow uses different Java collections for different responsibilities:
 - `HashMap<String, Transaction>` provides key-based lookups using transaction IDs.
 - `HashSet<String>` helps identify duplicate transaction IDs.
 
-The lookup methods are being refactored to use pre-built HashMaps instead of repeatedly iterating through transaction lists.
+Pre-built HashMaps are used to improve lookup efficiency instead of repeatedly iterating through transaction lists.
 
 This improves average lookup complexity from **O(n) to O(1)**.
 
@@ -68,6 +75,23 @@ The original lists remain important because a HashMap can only store one value p
 `BigDecimal` is used for monetary values to avoid floating-point precision issues.
 
 Transaction amounts are compared using `compareTo()` rather than direct object equality.
+
+### Database Persistence
+
+ReconFlow uses PostgreSQL as its relational database and Hibernate/JPA for persistence.
+
+The current database structure consists of two tables:
+
+- `payments`: stores transactions originating from the payment system.
+- `accounting`: stores transactions originating from the accounting system.
+
+Both tables use generated primary keys and store monetary values using `NUMERIC(12, 2)`.
+
+Hibernate's `EntityManager` handles database operations and transaction management.
+
+During import, existing records are checked using both `transaction_id` and `amount`. Identical records are not inserted again, preventing repeated application launches from creating unnecessary copies.
+
+Potential duplicate transaction IDs with different amounts or distinct records remain available for reconciliation analysis.
 
 ## Project Structure
 
@@ -81,9 +105,10 @@ reconflow/
 │       └── java/
 │           └── org/
 │               └── reconflow/
-│                   ├── exception/
+│                   ├── config/
+│                   ├── exceptions/
 │                   ├── inputHelpers/
-│                   ├── model/
+│                   ├── models/
 │                   ├── repository/
 │                   ├── service/
 │                   ├── UI/
@@ -98,6 +123,7 @@ reconflow/
 
 - Java JDK 21 or later
 - Maven
+- PostgreSQL
 - Git
 
 ### Run the Application
@@ -109,18 +135,19 @@ git clone https://github.com/Carmelo85S/reconflow.git
 ```
 
 2. Open the project in IntelliJ IDEA.
-3. Ensure that `payments.csv` and `accounting.csv` are located in the `data/` directory at the project root.
-4. Run the `Main` class.
+3. Configure the PostgreSQL connection and Hibernate persistence settings.
+4. Ensure that `payments.csv` and `accounting.csv` are located in the `data/` directory at the project root.
+5. Run the `Main` class.
 
 ## Reconciliation Scenarios
 
-| **Scenario** | **Description** |
-|---|---|
-| Match | Transaction ID and amount match in both systems |
-| Amount mismatch | Transaction exists in both systems, but the amounts differ |
-| Missing in accounting | Transaction exists only in the payment system |
-| Missing in payment system | Transaction exists only in the accounting system |
-| Potential duplicate | A transaction ID appears more than once in the payment data |
+| **Scenario**              | **Description**                                            |
+| ------------------------- | ---------------------------------------------------------- |
+| Match                     | Transaction ID and amount match in both systems            |
+| Amount mismatch           | Transaction exists in both systems, but the amounts differ |
+| Missing in accounting     | Transaction exists only in the payment system              |
+| Missing in payment system | Transaction exists only in the accounting system           |
+| Potential duplicate       | A transaction ID appears more than once in the source data |
 
 ## Roadmap
 
@@ -133,13 +160,11 @@ git clone https://github.com/Carmelo85S/reconflow.git
 - [x] Display payment and accounting transactions side by side
 - [x] Display reconciliation discrepancies
 - [x] Introduce HashMap-based lookup methods
-- [ ] Build lookup maps once in the application entry point
-- [ ] Verify reconciliation results after lookup optimization
-- [ ] Improve input validation and error handling
-- [ ] Write unit tests with JUnit 5
-- [ ] Implement CSV report export
-- [ ] Integrate PostgreSQL using JDBC
-- [ ] Explore a REST API with Spring Boot
+- [x] Integrate PostgreSQL
+- [x] Configure Hibernate/JPA persistence
+- [x] Create payment and accounting database entities
+- [x] Persist payment and accounting transactions
+- [x] Prevent repeated imports of identical transactions
 
 ## Learning Objectives
 
@@ -153,11 +178,16 @@ The main objectives are to practise:
 - Financial data handling
 - Exception handling and unit testing
 - Algorithmic complexity and efficient lookups
-- Database integration and backend architecture
+- Relational database design
+- Hibernate and ORM concepts
+- Database transactions and data integrity
+- Backend architecture and REST API development
 
 ## Project Status
 
-ReconFlow is an educational project under active development. It uses sample data and is not intended for production financial processing.
+ReconFlow is an educational project under active development. It currently uses sample data and PostgreSQL persistence. Reconciliation history and database-based result storage are planned features.
+
+It is not intended for production financial processing.
 
 ## Author
 
