@@ -2,14 +2,16 @@ package org.reconflow;
 
 import org.reconflow.config.EntityManagerUtil;
 import org.reconflow.inputHelpers.InputHelpers;
+import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
+import org.reconflow.repository.PaymentRepository;
+import org.reconflow.repository.PaymentRepositoryImp;
 import org.reconflow.service.ReconciliationService;
 
 
 import java.util.List;
 import java.util.Scanner;
 import java.util.HashMap;
-import java.util.Map;
 
 import static org.reconflow.UI.Layout.*;
 import static org.reconflow.repository.HandleData.loadData;
@@ -17,6 +19,8 @@ import static org.reconflow.service.Menu.runAction;
 
 public class Main {
     public static void main(String[] args) {
+        PaymentRepositoryImp pri = new PaymentRepositoryImp();
+
         EntityManagerUtil.getEntityManagerFactory();
 
         printWelcomeMessage();
@@ -34,6 +38,13 @@ public class Main {
         for(Transaction transaction : accountingTransactions){
             accountingById.put(transaction.getTransactionId(), transaction);
         }
+
+        List<Payments> payments = paymentTransactions.stream()
+                .map(transaction -> new Payments(
+                        transaction.getTransactionId(),
+                        transaction.getAmount()
+                ))
+                .toList();
 
 
         ReconciliationService service = new ReconciliationService();
@@ -54,7 +65,9 @@ public class Main {
                         paymentTransactions,
                         accountingTransactions,
                         paymentById,
-                        accountingById
+                        accountingById,
+                        payments,
+                        pri
                 );
             }
         }

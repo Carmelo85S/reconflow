@@ -1,7 +1,10 @@
 package org.reconflow.service;
 
 import org.reconflow.exceptions.QuitReconflowOperationException;
+import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
+import org.reconflow.repository.PaymentRepository;
+import org.reconflow.repository.PaymentRepositoryImp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +13,7 @@ import java.util.Scanner;
 public class Menu {
 
     public static void runAction(Scanner scanner, int choice, ReconciliationService service, List<Transaction> paymentTransactions, List<Transaction> accountingTransactions, HashMap<String, Transaction> paymentById,
-                                 HashMap<String, Transaction> accountingById) {
+                                 HashMap<String, Transaction> accountingById, List<Payments> payments, PaymentRepositoryImp pri) {
         try {
             switch (choice) {
                 case 1 -> service.runReconciliation(paymentTransactions, accountingById);
@@ -22,7 +25,7 @@ public class Menu {
                         paymentById,
                         accountingById
                 );
-                case 5 -> System.out.println("Export report");
+                case 5 -> pri.save(payments);
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid input");
             }
