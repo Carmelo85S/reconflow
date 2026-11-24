@@ -106,6 +106,22 @@ During import, existing records are checked using both `transaction_id` and `amo
 
 Potential duplicate transaction IDs with different amounts or distinct records remain available for reconciliation analysis.
 
+### ACID Transactions
+
+Database operations use JPA transactions to maintain data integrity.
+
+The repository executes payment and accounting imports within a single database transaction.
+
+The implementation supports the four ACID properties:
+
+- **Atomicity:** Payment and accounting records are persisted together. If an error occurs, the transaction is rolled back.
+- **Consistency:** Database constraints enforce data validity and integrity.
+- **Isolation:** Transaction isolation is handled by PostgreSQL according to the configured isolation level.
+- **Durability:** Committed transactions are persisted by PostgreSQL.
+
+This transactional approach prevents partial imports when an operation fails.
+
+
 ## Project Structure
 
 ```text
