@@ -4,8 +4,7 @@ import org.reconflow.exceptions.QuitReconflowOperationException;
 import org.reconflow.models.Accounting;
 import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
-import org.reconflow.repository.PaymentRepository;
-import org.reconflow.repository.PaymentRepositoryImp;
+import org.reconflow.repository.TransactionsRepositoryImp;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +13,7 @@ import java.util.Scanner;
 public class Menu {
 
     public static void runAction(Scanner scanner, int choice, ReconciliationService service, List<Transaction> paymentTransactions, List<Transaction> accountingTransactions, HashMap<String, Transaction> paymentById,
-                                 HashMap<String, Transaction> accountingById, List<Payments> payments, List<Accounting> accounting, PaymentRepositoryImp pri) {
+                                 HashMap<String, Transaction> accountingById, List<Payments> payments, List<Accounting> accounting, TransactionsRepositoryImp pri) {
         try {
             switch (choice) {
                 case 1 -> service.runReconciliation(paymentTransactions, accountingById);

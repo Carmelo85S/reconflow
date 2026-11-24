@@ -5,8 +5,7 @@ import org.reconflow.inputHelpers.InputHelpers;
 import org.reconflow.models.Accounting;
 import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
-import org.reconflow.repository.PaymentRepository;
-import org.reconflow.repository.PaymentRepositoryImp;
+import org.reconflow.repository.TransactionsRepositoryImp;
 import org.reconflow.service.ReconciliationService;
 
 
@@ -20,7 +19,7 @@ import static org.reconflow.service.Menu.runAction;
 
 public class Main {
     public static void main(String[] args) {
-        PaymentRepositoryImp pri = new PaymentRepositoryImp();
+        TransactionsRepositoryImp pri = new TransactionsRepositoryImp();
 
         EntityManagerUtil.getEntityManagerFactory();
 
