@@ -4,7 +4,7 @@
 
 ReconFlow is a learning project designed to explore how financial systems compare transaction records from different sources, identify discrepancies, and highlight transactions that require further investigation.
 
-The project uses Java, Hibernate/JPA, and PostgreSQL to manage and persist transaction data.
+The project uses Java, Hibernate/JPA, and PostgreSQL to manage transaction data and persist reconciliation history.
 
 ## Example Output
 
@@ -44,6 +44,9 @@ ReconFlow aims to identify these differences through a reconciliation process, h
 - Retrieve all transactions or search by database ID or transaction ID.
 - Delete individual transactions or clear all records from either source.
 - Prevent repeated imports of identical transactions using transaction ID and amount.
+- Create and persist reconciliation runs.
+- Store individual reconciliation results linked to each run.
+- Maintain reconciliation summaries, including total transactions, matches, discrepancies, and potential duplicates.
 
 ## Technologies
 
@@ -54,6 +57,7 @@ ReconFlow aims to identify these differences through a reconciliation process, h
 - **BigDecimal** for monetary values
 - **Java Collections:** List, HashMap and HashSet
 - **CSV file handling**
+- **Flyway** for database migrations
 - **Git and GitHub**
 
 ## Technical Implementation
@@ -82,18 +86,20 @@ Transaction amounts are compared using `compareTo()` rather than direct object e
 
 ReconFlow uses PostgreSQL as its relational database and Hibernate/JPA for persistence.
 
-The current database structure consists of two tables:
+The database structure includes four tables:
 
 - `payments`: stores transactions originating from the payment system.
 - `accounting`: stores transactions originating from the accounting system.
+- `reconciliation_runs`: stores individual reconciliation executions and their summary information.
+- `reconciliation_results`: stores the individual transaction results associated with each reconciliation run.
 
-Both tables use generated primary keys and store monetary values using `NUMERIC(12, 2)`.
+Both source transaction tables use generated primary keys and store monetary values using `NUMERIC(12, 2)`.
 
 Hibernate's `EntityManager` handles database operations and transaction management.
 
-A shared `TransactionsRepository` provides persistence operations for both entities.
+A shared `TransactionsRepository` provides persistence operations for payment and accounting entities.
 
-The repository currently supports:
+The transaction repository supports:
 
 - Saving payment and accounting transactions.
 - Retrieving all records from either table.
@@ -106,21 +112,48 @@ During import, existing records are checked using both `transaction_id` and `amo
 
 Potential duplicate transaction IDs with different amounts or distinct records remain available for reconciliation analysis.
 
+### Reconciliation History
+
+Each reconciliation execution creates a new `ReconciliationRun` entity.
+
+A run stores summary information:
+
+- Creation timestamp.
+- Total number of reconciliation results.
+- Number of matched transactions.
+- Number of discrepancies.
+- Number of potential duplicates.
+
+Each individual `ReconciliationResult` stores:
+
+- Transaction ID.
+- Payment amount.
+- Accounting amount.
+- Reconciliation status.
+- Reference to its parent reconciliation run.
+
+The relationship between `ReconciliationRun` and `ReconciliationResult` is one-to-many.
+
+A single reconciliation run can contain multiple transaction results, while each result belongs to one run.
+
+This design preserves historical reconciliation data instead of overwriting previous results.
+
 ### ACID Transactions
 
 Database operations use JPA transactions to maintain data integrity.
 
-The repository executes payment and accounting imports within a single database transaction.
+Payment and accounting imports are executed within a database transaction.
+
+Reconciliation history is also persisted transactionally: the reconciliation run and all its individual results are saved within the same database transaction.
 
 The implementation supports the four ACID properties:
 
-- **Atomicity:** Payment and accounting records are persisted together. If an error occurs, the transaction is rolled back.
+- **Atomicity:** Related records are persisted together. If an error occurs, the transaction is rolled back.
 - **Consistency:** Database constraints enforce data validity and integrity.
 - **Isolation:** Transaction isolation is handled by PostgreSQL according to the configured isolation level.
 - **Durability:** Committed transactions are persisted by PostgreSQL.
 
-This transactional approach prevents partial imports when an operation fails.
-
+This transactional approach prevents partial imports and incomplete reconciliation history.
 
 ## Project Structure
 
@@ -131,17 +164,20 @@ reconflow/
 │   └── accounting.csv
 ├── src/
 │   └── main/
-│       └── java/
-│           └── org/
-│               └── reconflow/
-│                   ├── config/
-│                   ├── exceptions/
-│                   ├── inputHelpers/
-│                   ├── models/
-│                   ├── repository/
-│                   ├── service/
-│                   ├── UI/
-│                   └── Main.java
+│       ├── java/
+│       │   └── org/
+│       │       └── reconflow/
+│       │           ├── config/
+│       │           ├── exceptions/
+│       │           ├── inputHelpers/
+│       │           ├── models/
+│       │           ├── repository/
+│       │           ├── service/
+│       │           ├── UI/
+│       │           └── Main.java
+│       └── resources/
+│           └── db/
+│               └── migration/
 ├── pom.xml
 └── README.md
 ```
@@ -164,9 +200,11 @@ git clone https://github.com/Carmelo85S/reconflow.git
 ```
 
 2. Open the project in IntelliJ IDEA.
-3. Configure the PostgreSQL connection and Hibernate persistence settings.
+3. Configure the PostgreSQL connection and environment variables.
 4. Ensure that `payments.csv` and `accounting.csv` are located in the `data/` directory at the project root.
 5. Run the `Main` class.
+
+Flyway applies the database migrations during application initialization.
 
 ## Reconciliation Scenarios
 
@@ -197,6 +235,10 @@ git clone https://github.com/Carmelo85S/reconflow.git
 - [x] Implement transaction lookup operations
 - [x] Implement transaction deletion operations
 - [x] Prevent repeated imports of identical transactions
+- [x] Create reconciliation run and result entities
+- [x] Establish one-to-many relationship between runs and results
+- [x] Persist reconciliation history in PostgreSQL
+- [x] Save reconciliation runs and results within a single database transaction
 
 ## Learning Objectives
 
@@ -212,14 +254,15 @@ The main objectives are to practise:
 - Algorithmic complexity and efficient lookups
 - Relational database design
 - Hibernate and ORM concepts
+- Entity relationships and database persistence
 - Database transactions and data integrity
 - Backend architecture and REST API development
 
 ## Project Status
 
-ReconFlow is an educational project under active development. It currently supports CSV-based transaction input, reconciliation logic, and PostgreSQL persistence through Hibernate/JPA.
+ReconFlow is an educational project under active development.
 
-Reconciliation history and database-based result storage are planned features.
+It currently supports CSV-based transaction input, transaction reconciliation, PostgreSQL persistence, and historical storage of reconciliation runs and their individual results through Hibernate/JPA.
 
 It is not intended for production financial processing.
 
