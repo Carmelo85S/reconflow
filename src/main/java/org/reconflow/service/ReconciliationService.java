@@ -1,7 +1,10 @@
 package org.reconflow.service;
 
+import org.reconflow.models.ReconciliationResult;
+import org.reconflow.models.ReconciliationRun;
 import org.reconflow.models.ReconciliationStatus;
 import org.reconflow.models.Transaction;
+import org.reconflow.repository.ReconciliationRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,19 +14,46 @@ import java.util.List;
 import static org.reconflow.UI.Layout.headerTable;
 
 public class ReconciliationService {
+    private final ReconciliationRepository reconciliationRepository;
+
+    public ReconciliationService(ReconciliationRepository reconciliationRepository) {
+        this.reconciliationRepository = reconciliationRepository;
+    }
 
     public void runReconciliation(List<Transaction> paymentTransactions,
                                   HashMap<String, Transaction> accountingById) {
 
+
         headerTable();
 
         List<Transaction> duplicated = findDuplicates(paymentTransactions);
+
+        ReconciliationRun run = new ReconciliationRun();
+
+        int matchedCount = 0;
+        int discrepancyCount = 0;
+        int duplicateCount = 0;
 
         for (Transaction payment : paymentTransactions) {
 
             Transaction accounting = findAccountingTransaction(payment, accountingById);
 
             ReconciliationStatus status = determineStatus(payment, accounting, duplicated);
+
+            ReconciliationResult result = new ReconciliationResult();
+
+            result.setTransactionId(payment.getTransactionId());
+            result.setPaymentAmount(payment.getAmount());
+            result.setAccountingAmount(accounting != null ? accounting.getAmount():null);
+            result.setStatus(status);
+            run.addResult(result);
+            if(status == ReconciliationStatus.MATCH){
+                matchedCount++;
+            }else if(status == ReconciliationStatus.POTENTIAL_DUPLICATE){
+                duplicateCount++;
+            }else{
+                discrepancyCount++;
+            }
 
             System.out.printf(
                     "| %-14s | %-14s | %-17s | %-25s | %n",
@@ -34,8 +64,15 @@ public class ReconciliationService {
             );
         }
         System.out.println(" ---------------------------------------------------------------------------------");
+        run.setTotalTransactions(run.getResults().size());
+        run.setMatchedCount(matchedCount);
+        run.setDiscrepancyCount(discrepancyCount);
+        run.setDuplicateCount(duplicateCount);
 
+        System.out.println("Results: " + run.getResults().size());
+        reconciliationRepository.save(run);
     }
+
 
     public void viewDiscrepancies(
             List<Transaction> paymentTransactions,

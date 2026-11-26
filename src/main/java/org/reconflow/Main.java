@@ -5,6 +5,8 @@ import org.reconflow.inputHelpers.InputHelpers;
 import org.reconflow.models.Accounting;
 import org.reconflow.models.Payments;
 import org.reconflow.models.Transaction;
+import org.reconflow.repository.ReconciliationRepository;
+import org.reconflow.repository.ReconciliationRepositoryImpl;
 import org.reconflow.repository.TransactionsRepositoryImp;
 import org.reconflow.service.ReconciliationService;
 
@@ -54,7 +56,11 @@ public class Main {
                 .toList();
 
 
-        ReconciliationService service = new ReconciliationService();
+        ReconciliationRepository reconciliationRepository =
+                new ReconciliationRepositoryImpl();
+
+        ReconciliationService service =
+                new ReconciliationService(reconciliationRepository);
 
         printHeader("Recon Flow", "Transaction Reconciliation");
         boolean running = true;
