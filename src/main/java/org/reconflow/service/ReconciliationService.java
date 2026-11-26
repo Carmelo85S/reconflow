@@ -12,8 +12,8 @@ import static org.reconflow.UI.Layout.headerTable;
 
 public class ReconciliationService {
 
-    public void runReconciliation(  List<Transaction> paymentTransactions,
-                                    HashMap<String, Transaction> accountingById) {
+    public void runReconciliation(List<Transaction> paymentTransactions,
+                                  HashMap<String, Transaction> accountingById) {
 
         headerTable();
 
@@ -109,10 +109,27 @@ public class ReconciliationService {
     }
 
     public void viewDuplicated(List<Transaction> paymentTransactions) {
+
         List<Transaction> duplicated = findDuplicates(paymentTransactions);
-        for (Transaction d : duplicated) {
-            System.out.println(d.getTransactionId() + " - " + d.getAmount());
+
+        if (duplicated.isEmpty()) {
+            System.out.println("No duplicated transactions found.");
+            return;
         }
+
+        System.out.println("=== DUPLICATED TRANSACTIONS ===");
+
+        System.out.println("+----------------------+------------+");
+        System.out.printf("| %-20s | %-10s |%n", "TRANSACTION ID", "AMOUNT");
+        System.out.println("+----------------------+------------+");
+
+        for (Transaction d : duplicated) {
+            System.out.printf("| %-20s | %10.2f |%n",
+                    d.getTransactionId(),
+                    d.getAmount());
+        }
+
+        System.out.println("+----------------------+------------+");
     }
 
     public static boolean isMatch(Transaction paymentTransactions, Transaction accountingTransaction) {
