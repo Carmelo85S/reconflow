@@ -7,6 +7,7 @@ import org.reconflow.models.Transaction;
 import org.reconflow.repository.ReconciliationRepository;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static org.reconflow.UI.Layout.headerTable;
@@ -21,7 +22,7 @@ public class ReconciliationService {
     public void runReconciliation(List<Transaction> paymentTransactions,
                                   List<Transaction> accountingTransactions,
                                   HashMap<String, Transaction> accountingById,
-                                  HashMap<String, Transaction> paymentById){
+                                  HashMap<String, Transaction> paymentById) {
 
 
         headerTable();
@@ -44,14 +45,14 @@ public class ReconciliationService {
 
             result.setTransactionId(payment.getTransactionId());
             result.setPaymentAmount(payment.getAmount());
-            result.setAccountingAmount(accounting != null ? accounting.getAmount():null);
+            result.setAccountingAmount(accounting != null ? accounting.getAmount() : null);
             result.setStatus(status);
             run.addResult(result);
-            if(status == ReconciliationStatus.MATCH){
+            if (status == ReconciliationStatus.MATCH) {
                 matchedCount++;
-            }else if(status == ReconciliationStatus.POTENTIAL_DUPLICATE){
+            } else if (status == ReconciliationStatus.POTENTIAL_DUPLICATE) {
                 duplicateCount++;
-            }else{
+            } else {
                 discrepancyCount++;
             }
 
@@ -64,10 +65,10 @@ public class ReconciliationService {
             );
         }
 
-        for(Transaction accounting : accountingTransactions){
+        for (Transaction accounting : accountingTransactions) {
             Transaction payment = findPaymentTransaction(accounting, paymentById);
 
-            if(payment == null){
+            if (payment == null) {
                 ReconciliationResult result = new ReconciliationResult();
                 result.setTransactionId(accounting.getTransactionId());
                 result.setPaymentAmount(null);
@@ -96,7 +97,7 @@ public class ReconciliationService {
 
         Optional<ReconciliationRun> latestRun = reconciliationRepository.findLatest();
 
-        if(latestRun.isPresent() && hasSameResult(run, latestRun.get())){
+        if (latestRun.isPresent() && hasSameResult(run, latestRun.get())) {
             System.out.println("No change detected. Reconciliation not saved");
             return;
         }
@@ -311,5 +312,44 @@ public class ReconciliationService {
 
         return ReconciliationStatus.AMOUNT_MISMATCH;
 
+    }
+
+    public void viewReconciliationHistory() {
+        List<ReconciliationRun> runs = reconciliationRepository.findAll();
+        if (runs.isEmpty()) {
+            System.out.println("No reconciliation history found.");
+            return;
+        }
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String separator = "--------------------------------------------------------------------------------";
+
+        System.out.println(separator);
+
+        System.out.printf(
+                "| %-6s | %-19s | %8s | %7s | %13s | %10s |%n",
+                "Run ID",
+                "Created at",
+                "Total",
+                "Matched",
+                "Discrepancies",
+                "Duplicates"
+        );
+
+        System.out.println(separator);
+
+        for (ReconciliationRun r : runs) {
+            System.out.printf(
+                    "| %-6d | %-19s | %8d | %7d | %13d | %10d |%n",
+                    r.getId(),
+                    r.getCreatedAt().format(formatter),
+                    r.getTotalTransactions(),
+                    r.getMatchedCount(),
+                    r.getDiscrepancyCount(),
+                    r.getDuplicateCount()
+            );
+        }
+
+        System.out.println("--------------------------------------------------------------------------------");
     }
 }

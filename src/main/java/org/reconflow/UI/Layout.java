@@ -35,6 +35,7 @@ public class Layout {
         System.out.println("[3] View duplicated");
         System.out.println("[4] View discrepancies");
         System.out.println("[5] Save report");
+        System.out.println("[6] View reconciliation history");
         System.out.println("[0] Exit");
     }
 

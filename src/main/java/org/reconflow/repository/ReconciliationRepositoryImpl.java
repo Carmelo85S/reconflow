@@ -64,7 +64,13 @@ public class ReconciliationRepositoryImpl implements ReconciliationRepository {
 
     @Override
     public List<ReconciliationRun> findAll() {
-        return List.of();
+        try (EntityManager em =
+                     EntityManagerUtil.getEntityManagerFactory().createEntityManager()) {
+            return em.createQuery(
+                    "SELECT r FROM ReconciliationRun r ORDER BY r.createdAt DESC",
+                    ReconciliationRun.class
+            ).getResultList();
+        }
     }
 
     @Override

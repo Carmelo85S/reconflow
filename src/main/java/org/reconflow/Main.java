@@ -21,7 +21,7 @@ import static org.reconflow.service.Menu.runAction;
 
 public class Main {
     public static void main(String[] args) {
-        TransactionsRepositoryImp pri = new TransactionsRepositoryImp();
+        TransactionsRepositoryImp tri = new TransactionsRepositoryImp();
 
         EntityManagerUtil.getEntityManagerFactory();
 
@@ -67,7 +67,7 @@ public class Main {
         int choice;
         while (running) {
             showMenu();
-            choice = InputHelpers.readMenuChoice(scanner, 0, 5, "Choose your option: > ");
+            choice = InputHelpers.readMenuChoice(scanner, 0, 6, "Choose your option: > ");
             if (choice == 0) {
                 running = false;
             } else {
@@ -81,7 +81,7 @@ public class Main {
                         accountingById,
                         payments,
                         accounting,
-                        pri
+                        tri
                 );
             }
         }
