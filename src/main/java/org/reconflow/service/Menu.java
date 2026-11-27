@@ -16,7 +16,7 @@ public class Menu {
                                  HashMap<String, Transaction> accountingById, List<Payments> payments, List<Accounting> accounting, TransactionsRepositoryImp pri) {
         try {
             switch (choice) {
-                case 1 -> service.runReconciliation(paymentTransactions, accountingById);
+                case 1 -> service.runReconciliation(paymentTransactions, accountingTransactions, accountingById, paymentById);
                 case 2 -> service.viewTransactions(paymentTransactions, accountingTransactions);
                 case 3 -> service.viewDuplicated(paymentTransactions);
                 case 4 -> service.viewDiscrepancies(

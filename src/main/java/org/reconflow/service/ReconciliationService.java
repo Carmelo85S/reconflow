@@ -19,7 +19,9 @@ public class ReconciliationService {
     }
 
     public void runReconciliation(List<Transaction> paymentTransactions,
-                                  HashMap<String, Transaction> accountingById) {
+                                  List<Transaction> accountingTransactions,
+                                  HashMap<String, Transaction> accountingById,
+                                  HashMap<String, Transaction> paymentById){
 
 
         headerTable();
@@ -61,6 +63,29 @@ public class ReconciliationService {
                     status.getLabel()
             );
         }
+
+        for(Transaction accounting : accountingTransactions){
+            Transaction payment = findPaymentTransaction(accounting, paymentById);
+
+            if(payment == null){
+                ReconciliationResult result = new ReconciliationResult();
+                result.setTransactionId(accounting.getTransactionId());
+                result.setPaymentAmount(null);
+                result.setAccountingAmount(accounting.getAmount());
+                result.setStatus(ReconciliationStatus.MISSING_IN_PAYMENT_SYSTEM);
+
+                run.addResult(result);
+                discrepancyCount++;
+
+                System.out.printf(
+                        "| %-14s | %-14s | %-17s | %-25s | %n",
+                        accounting.getTransactionId(),
+                        "-",
+                        accounting.getAmount(),
+                        ReconciliationStatus.MISSING_IN_PAYMENT_SYSTEM.getLabel()
+                );
+            }
+        }
         System.out.println(" ---------------------------------------------------------------------------------");
         run.setTotalTransactions(run.getResults().size());
         run.setMatchedCount(matchedCount);
@@ -75,9 +100,6 @@ public class ReconciliationService {
             System.out.println("No change detected. Reconciliation not saved");
             return;
         }
-        boolean same = hasSameResult(run, latestRun.get());
-
-        System.out.println("Same results: " + same);
 
         reconciliationRepository.save(run);
     }
