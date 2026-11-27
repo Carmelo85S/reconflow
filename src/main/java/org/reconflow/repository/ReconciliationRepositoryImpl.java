@@ -34,6 +34,35 @@ public class ReconciliationRepositoryImpl implements ReconciliationRepository {
     }
 
     @Override
+    public Optional<ReconciliationRun> findLatest() {
+        try (EntityManager em =
+                     EntityManagerUtil.getEntityManagerFactory().createEntityManager()) {
+            Optional<Long> latestId = em.createQuery(
+                            "SELECT r.id " +
+                                    "FROM ReconciliationRun r " +
+                                    "ORDER BY r.createdAt DESC, r.id DESC",
+                            Long.class
+                    ).setMaxResults(1)
+                    .getResultStream()
+                    .findFirst();
+
+            if (latestId.isEmpty()) {
+                return Optional.empty();
+            }
+
+            return em.createQuery(
+                            "SELECT DISTINCT r " +
+                                    "FROM ReconciliationRun r " +
+                                    "LEFT JOIN FETCH r.results " +
+                                    "WHERE r.id = :id",
+                            ReconciliationRun.class
+                    ).setParameter("id", latestId.get())
+                    .getResultStream()
+                    .findFirst();
+        }
+    }
+
+    @Override
     public List<ReconciliationRun> findAll() {
         return List.of();
     }
@@ -42,6 +71,8 @@ public class ReconciliationRepositoryImpl implements ReconciliationRepository {
     public Optional<ReconciliationRun> findById() {
         return Optional.empty();
     }
+
+
 
     @Override
     public boolean deleteById(Long id) {

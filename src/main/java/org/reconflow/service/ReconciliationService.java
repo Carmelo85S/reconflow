@@ -6,10 +6,8 @@ import org.reconflow.models.ReconciliationStatus;
 import org.reconflow.models.Transaction;
 import org.reconflow.repository.ReconciliationRepository;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.math.BigDecimal;
+import java.util.*;
 
 import static org.reconflow.UI.Layout.headerTable;
 
@@ -70,9 +68,69 @@ public class ReconciliationService {
         run.setDuplicateCount(duplicateCount);
 
         System.out.println("Results: " + run.getResults().size());
+
+        Optional<ReconciliationRun> latestRun = reconciliationRepository.findLatest();
+
+        if(latestRun.isPresent() && hasSameResult(run, latestRun.get())){
+            System.out.println("No change detected. Reconciliation not saved");
+            return;
+        }
+        boolean same = hasSameResult(run, latestRun.get());
+
+        System.out.println("Same results: " + same);
+
         reconciliationRepository.save(run);
     }
 
+    private boolean hasSameResult(
+            ReconciliationRun current,
+            ReconciliationRun latest
+    ) {
+        List<ReconciliationResult> unmatched =
+                new ArrayList<>(latest.getResults());
+
+        if (current.getResults().size() != unmatched.size()) {
+            return false;
+        }
+
+        for (ReconciliationResult currentResult : current.getResults()) {
+
+            int index = -1;
+
+            for (int i = 0; i < unmatched.size(); i++) {
+                if (sameResult(currentResult, unmatched.get(i))) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index == -1) {
+                return false;
+            }
+
+            unmatched.remove(index);
+        }
+
+        return unmatched.isEmpty();
+    }
+
+    private boolean sameResult(
+            ReconciliationResult a,
+            ReconciliationResult b
+    ) {
+        return Objects.equals(a.getTransactionId(), b.getTransactionId())
+                && sameAmount(a.getPaymentAmount(), b.getPaymentAmount())
+                && sameAmount(a.getAccountingAmount(), b.getAccountingAmount())
+                && a.getStatus() == b.getStatus();
+    }
+
+    private boolean sameAmount(BigDecimal a, BigDecimal b) {
+        if (a == null || b == null) {
+            return a == b;
+        }
+
+        return a.compareTo(b) == 0;
+    }
 
     public void viewDiscrepancies(
             List<Transaction> paymentTransactions,
