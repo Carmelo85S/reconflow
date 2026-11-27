@@ -47,6 +47,14 @@ ReconFlow aims to identify these differences through a reconciliation process, h
 - Create and persist reconciliation runs.
 - Store individual reconciliation results linked to each run.
 - Maintain reconciliation summaries, including total transactions, matches, discrepancies, and potential duplicates.
+- Compare new reconciliation results with the latest saved run.
+- Prevent saving a new reconciliation run when no changes are detected.
+- Bidirectional reconciliation between payment and accounting records
+- Detection of transactions missing from either system
+- Detection of potential duplicate transactions
+- Comparison of new reconciliation results with the latest saved run
+- Prevention of duplicate reconciliation runs when no changes are detected
+- Persistence of reconciliation runs and individual results in PostgreSQL
 
 ## Technologies
 
@@ -138,6 +146,17 @@ A single reconciliation run can contain multiple transaction results, while each
 
 This design preserves historical reconciliation data instead of overwriting previous results.
 
+Before persisting a new reconciliation run, ReconFlow compares its results with the latest saved run.
+
+If all transaction IDs, amounts, and reconciliation statuses are unchanged, the new run is skipped. This prevents unnecessary duplicate entries in the reconciliation history.
+
+A new run is persisted when changes are detected, such as modified transaction amounts, new transactions, or different reconciliation statuses.
+
+Each reconciliation run stores its individual transaction results, including transaction IDs, payment amounts, accounting amounts, and reconciliation statuses.
+
+ReconFlow performs bidirectional reconciliation, identifying transactions that exist in the payment system but are missing from accounting, as well as transactions recorded in accounting but missing from the payment system.
+
+Before saving a new run, the application compares its results with the latest saved run. If all transaction IDs, amounts, and statuses remain unchanged, the new run is skipped. This prevents unnecessary duplicate entries in the reconciliation history.
 ### ACID Transactions
 
 Database operations use JPA transactions to maintain data integrity.
@@ -239,7 +258,17 @@ Flyway applies the database migrations during application initialization.
 - [x] Establish one-to-many relationship between runs and results
 - [x] Persist reconciliation history in PostgreSQL
 - [x] Save reconciliation runs and results within a single database transaction
-
+- [x] Compare reconciliation results with the latest saved run
+- [x] Prevent duplicate reconciliation runs when no changes are detected
+- [x] Implement bidirectional transaction reconciliation
+- [x] Detect potential duplicate transactions
+- [x] Persist reconciliation runs and individual results
+- [x] Compare results against the latest reconciliation run
+- [x] Prevent saving unchanged reconciliation runs
+- [ ] Retrieve and display reconciliation history
+- [ ] View detailed results for a selected run
+- [ ] Export reconciliation reports to CSV
+- 
 ## Learning Objectives
 
 This project is part of my journey toward becoming a Java developer, with a particular interest in backend development, banking, and financial technology.
@@ -262,9 +291,17 @@ The main objectives are to practise:
 
 ReconFlow is an educational project under active development.
 
-It currently supports CSV-based transaction input, transaction reconciliation, PostgreSQL persistence, and historical storage of reconciliation runs and their individual results through Hibernate/JPA.
+The application currently supports:
 
-It is not intended for production financial processing.
+- CSV-based transaction imports from payment and accounting systems.
+- Transaction reconciliation using transaction IDs and amounts.
+- Detection of matching transactions, amount mismatches, missing records, and potential duplicates.
+- PostgreSQL persistence using Hibernate/JPA.
+- Historical reconciliation runs, with individual transaction results and summary statistics.
+- Reconciliation history displayed through the CLI, including run IDs, timestamps, and result counts.
+- Duplicate-run prevention by comparing new reconciliation results with the latest saved run.
+
+Each reconciliation execution is stored as a separate run. A new run is only persisted when its results differ from the latest saved execution.
 
 ## Author
 
