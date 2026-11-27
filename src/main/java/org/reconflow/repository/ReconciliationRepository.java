@@ -9,7 +9,7 @@ public interface ReconciliationRepository {
 
     ReconciliationRun save(ReconciliationRun run);
     List<ReconciliationRun> findAll();
-    Optional<ReconciliationRun> findById();
+    Optional<ReconciliationRun> findById(Long id);
     Optional<ReconciliationRun> findLatest();
     boolean deleteById(Long id);
 }

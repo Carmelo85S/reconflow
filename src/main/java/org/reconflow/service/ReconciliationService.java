@@ -10,10 +10,13 @@ import java.math.BigDecimal;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static java.io.File.separator;
 import static org.reconflow.UI.Layout.headerTable;
+import static org.reconflow.inputHelpers.InputHelpers.readMenuChoice;
 
 public class ReconciliationService {
     private final ReconciliationRepository reconciliationRepository;
+    Scanner scanner = new Scanner(System.in);
 
     public ReconciliationService(ReconciliationRepository reconciliationRepository) {
         this.reconciliationRepository = reconciliationRepository;
@@ -352,4 +355,94 @@ public class ReconciliationService {
 
         System.out.println("--------------------------------------------------------------------------------");
     }
+
+
+    public void viewReconciliationDetails(Scanner scanner) {
+        System.out.println("\n========== RECONCILIATION DETAILS ==========");
+        System.out.println("[1] Choose reconciliation");
+        System.out.println("[2] Exit");
+
+        int choice = readMenuChoice(scanner, 1, 2, "Select option: ");
+
+        if (choice == 2) {
+            return;
+        }
+
+        Long runId = (long) readMenuChoice(
+                scanner, 1, Integer.MAX_VALUE, "Run ID: "
+        );
+
+        Optional<ReconciliationRun> run =
+                reconciliationRepository.findById(runId);
+
+        if (run.isEmpty()) {
+            System.out.println("Reconciliation run not found.");
+            return;
+        }
+
+        ReconciliationRun selectedRun = run.get();
+
+        DateTimeFormatter formatter =
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        String separator =
+                " -------------------------------------------------------------------------------- ";
+
+        System.out.println("\n========== RUN SUMMARY ==========");
+        System.out.println(separator);
+
+        System.out.printf(
+                "| %-6s | %-19s | %8s | %7s | %13s | %10s |%n",
+                "Run ID",
+                "Created at",
+                "Total",
+                "Matched",
+                "Discrepancies",
+                "Duplicates"
+        );
+
+        System.out.println(separator);
+
+        System.out.printf(
+                "| %-6d | %-19s | %8d | %7d | %13d | %10d |%n",
+                selectedRun.getId(),
+                selectedRun.getCreatedAt().format(formatter),
+                selectedRun.getTotalTransactions(),
+                selectedRun.getMatchedCount(),
+                selectedRun.getDiscrepancyCount(),
+                selectedRun.getDuplicateCount()
+        );
+
+        System.out.println(separator);
+
+        System.out.println("\n========== TRANSACTION RESULTS ==========");
+        System.out.println(separator);
+
+        System.out.printf(
+                "| %-15s | %12s | %12s | %-30s |%n",
+                "Transaction ID",
+                "Payment",
+                "Accounting",
+                "Status"
+        );
+
+        System.out.println(separator);
+
+        for (ReconciliationResult result : selectedRun.getResults()) {
+            System.out.printf(
+                    "| %-15s | %12s | %12s | %-30s |%n",
+                    result.getTransactionId(),
+                    result.getPaymentAmount() != null
+                            ? result.getPaymentAmount().toPlainString()
+                            : "-",
+                    result.getAccountingAmount() != null
+                            ? result.getAccountingAmount().toPlainString()
+                            : "-",
+                    result.getStatus()
+            );
+        }
+
+        System.out.println(separator);
+    }
+
 }

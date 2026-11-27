@@ -74,10 +74,19 @@ public class ReconciliationRepositoryImpl implements ReconciliationRepository {
     }
 
     @Override
-    public Optional<ReconciliationRun> findById() {
-        return Optional.empty();
+    public Optional<ReconciliationRun> findById(Long id) {
+        try (EntityManager em =
+                     EntityManagerUtil.getEntityManagerFactory().createEntityManager()) {
+            return em.createQuery(
+                            "SELECT DISTINCT r FROM ReconciliationRun r " +
+                                    "LEFT JOIN FETCH r.results " +
+                                    "WHERE r.id = :id",
+                            ReconciliationRun.class
+                    ).setParameter("id", id)
+                    .getResultStream()
+                    .findFirst();
+        }
     }
-
 
 
     @Override
