@@ -27,9 +27,10 @@ public class Menu {
                         paymentById,
                         accountingById
                 );
-                case 5 -> tri.save(payments, accounting);
-                case 6 -> service.viewReconciliationHistory();
-                case 7 -> service.viewReconciliationDetails(scanner);
+                case 5 -> service.viewReconciliationHistory();
+                case 6 -> service.viewReconciliationDetails(scanner);
+                case 7 -> tri.save(payments, accounting);
+                case 8 -> service.exportReconciliations();
                 case 0 -> System.out.println("Goodbye!");
                 default -> System.out.println("Invalid input");
             }

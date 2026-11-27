@@ -6,7 +6,11 @@ import org.reconflow.models.ReconciliationStatus;
 import org.reconflow.models.Transaction;
 import org.reconflow.repository.ReconciliationRepository;
 
+import javax.swing.text.html.Option;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -443,6 +447,59 @@ public class ReconciliationService {
         }
 
         System.out.println(separator);
+    }
+
+    public void exportReconciliations() {
+        System.out.println("Run ID: ");
+        Long runId = (long) readMenuChoice(
+                scanner, 1, Integer.MAX_VALUE, "Run Id: "
+        );
+
+        Optional<ReconciliationRun> run =
+                reconciliationRepository.findById(runId);
+
+        if (run.isEmpty()) {
+            System.out.println("Reconciliation run not found.");
+            return;
+        }
+
+        ReconciliationRun toExport = run.get();
+
+        Path path = Path.of(
+                "data", "reconciliation-run-" + runId + ".csv"
+        );
+
+        try {
+            Files.createDirectories(path.getParent());
+
+            StringBuilder csv = new StringBuilder();
+            DateTimeFormatter formatter =
+                    DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            csv.append("Transaction ID,Run ID,Payment,Accounting,Status,Created At\n");
+
+            for (ReconciliationResult result : toExport.getResults()) {
+                csv.append(result.getTransactionId()).append(",");
+
+                csv.append(toExport.getId()).append(",");
+
+                csv.append(result.getPaymentAmount() != null
+                        ? result.getPaymentAmount().toPlainString() : "").append(",");
+
+                csv.append(result.getAccountingAmount() != null
+                        ? result.getAccountingAmount().toPlainString() : "").append(",");
+
+                csv.append(result.getStatus()).append(",");
+
+                csv.append(toExport.getCreatedAt().format(formatter)).append("\n");
+            }
+
+            Files.writeString(path, csv.toString());
+
+            System.out.println("Report exported: " + path.toAbsolutePath());
+
+        } catch (IOException e) {
+            System.out.println("Error exporting report: " + e.getMessage());
+        }
     }
 
 }

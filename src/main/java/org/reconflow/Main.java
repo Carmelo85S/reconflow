@@ -67,7 +67,7 @@ public class Main {
         int choice;
         while (running) {
             showMenu();
-            choice = InputHelpers.readMenuChoice(scanner, 0, 7, "Choose your option: > ");
+            choice = InputHelpers.readMenuChoice(scanner, 0, 8, "Choose your option: > ");
             if (choice == 0) {
                 running = false;
             } else {
