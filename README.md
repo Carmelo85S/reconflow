@@ -267,8 +267,8 @@ Flyway applies the database migrations during application initialization.
 - [x] Prevent saving unchanged reconciliation runs
 - [x] Retrieve and display reconciliation history
 - [x] View detailed results for a selected run
-- [ ] Export reconciliation reports to CSV
-- 
+- [x] Export reconciliation reports to CSV
+
 ## Learning Objectives
 
 This project is part of my journey toward becoming a Java developer, with a particular interest in backend development, banking, and financial technology.
@@ -301,6 +301,7 @@ The application currently supports:
 - Reconciliation history displayed through the CLI, including run IDs, timestamps, and result counts.
 - Detailed inspection of historical runs, including transaction IDs, payment amounts, accounting amounts, and reconciliation statuses.
 - Duplicate-run prevention by comparing new reconciliation results with the latest saved run.
+- Export reconciliation reports to CSV, including transaction IDs, run IDs, payment and accounting amounts, reconciliation statuses, and creation timestamps.
 
 Each reconciliation execution is stored as a separate run. A new run is only persisted when its results differ from the latest saved execution.
 
