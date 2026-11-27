@@ -297,12 +297,14 @@ The application currently supports:
 - Transaction reconciliation using transaction IDs and amounts.
 - Detection of matching transactions, amount mismatches, missing records, and potential duplicates.
 - PostgreSQL persistence using Hibernate/JPA.
-- Historical reconciliation runs, with individual transaction results and summary statistics.
+- Historical reconciliation runs, storing individual transaction results and summary statistics.
 - Reconciliation history displayed through the CLI, including run IDs, timestamps, and result counts.
+- Detailed inspection of historical runs, including transaction IDs, payment amounts, accounting amounts, and reconciliation statuses.
 - Duplicate-run prevention by comparing new reconciliation results with the latest saved run.
 
 Each reconciliation execution is stored as a separate run. A new run is only persisted when its results differ from the latest saved execution.
 
+**Next steps:** Improve reconciliation history management and explore additional features such as deleting historical runs and generating reconciliation reports.
 ## Author
 
 **Carmelo Salis**
