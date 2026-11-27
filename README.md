@@ -265,8 +265,8 @@ Flyway applies the database migrations during application initialization.
 - [x] Persist reconciliation runs and individual results
 - [x] Compare results against the latest reconciliation run
 - [x] Prevent saving unchanged reconciliation runs
-- [ ] Retrieve and display reconciliation history
-- [ ] View detailed results for a selected run
+- [x] Retrieve and display reconciliation history
+- [x] View detailed results for a selected run
 - [ ] Export reconciliation reports to CSV
 - 
 ## Learning Objectives
