@@ -31,4 +31,14 @@ class ReconciliationServiceTest {
         assertFalse(result);
 
     }
+
+    @Test
+    void shouldReturnFalseWhenTransactionIdsAreDifferent() {
+        Transaction payment = new Transaction("TX001", new BigDecimal("55.00"));
+        Transaction accounting = new Transaction("TX002", new BigDecimal("55.00"));
+
+        boolean result = ReconciliationService.isMatch(payment, accounting);
+        assertFalse((result));
+    }
+
 }

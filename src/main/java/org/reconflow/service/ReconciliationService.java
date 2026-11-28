@@ -6,7 +6,6 @@ import org.reconflow.models.ReconciliationStatus;
 import org.reconflow.models.Transaction;
 import org.reconflow.repository.ReconciliationRepository;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -14,7 +13,6 @@ import java.nio.file.Path;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static java.io.File.separator;
 import static org.reconflow.UI.Layout.headerTable;
 import static org.reconflow.inputHelpers.InputHelpers.readMenuChoice;
 
